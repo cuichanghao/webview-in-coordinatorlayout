@@ -58,23 +58,22 @@ public class NestedWebView extends WebView implements NestedScrollingChild {
         int eventY = (int) event.getY();
         event.offsetLocation(0, mNestedOffsetY);
         switch (action) {
+            //fix calculate mLastY for with swipterefreshlayout
             case MotionEvent.ACTION_MOVE:
                 int deltaY = mLastY - eventY;
                 // NestedPreScroll
                 if (dispatchNestedPreScroll(0, deltaY, mScrollConsumed, mScrollOffset)) {
                     deltaY -= mScrollConsumed[1];
-                    mLastY = eventY - mScrollOffset[1];
                     event.offsetLocation(0, -mScrollOffset[1]);
-                    mNestedOffsetY += mScrollOffset[1];
+
                 }
                 returnValue = super.onTouchEvent(event);
 
                 // NestedScroll
                 if (dispatchNestedScroll(0, mScrollOffset[1], 0, deltaY, mScrollOffset)) {
                     event.offsetLocation(0, mScrollOffset[1]);
-                    mNestedOffsetY += mScrollOffset[1];
-                    mLastY -= mScrollOffset[1];
                 }
+                mLastY = eventY;
                 break;
             case MotionEvent.ACTION_DOWN:
                 returnValue = super.onTouchEvent(event);
