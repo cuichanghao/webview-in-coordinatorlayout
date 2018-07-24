@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package com.github.takahirom.webview_in_coodinator_layout;
+package jp.mdpr.mdprviewer.ui.common.view;
 
 import android.content.Context;
-import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.NestedScrollingChild;
 import android.support.v4.view.NestedScrollingChildHelper;
 import android.support.v4.view.ViewCompat;
@@ -51,27 +50,29 @@ public class NestedWebView extends WebView implements NestedScrollingChild {
         boolean returnValue = false;
 
         MotionEvent event = MotionEvent.obtain(ev);
-        final int action = MotionEventCompat.getActionMasked(event);
+        final int action = ev.getAction();
+
         if (action == MotionEvent.ACTION_DOWN) {
             mNestedOffsetY = 0;
         }
-        int eventY = (int) event.getY();
         event.offsetLocation(0, mNestedOffsetY);
+        int eventY = (int) event.getY();
+        
         switch (action) {
-            //fix calculate mLastY for with swipterefreshlayout
             case MotionEvent.ACTION_MOVE:
                 int deltaY = mLastY - eventY;
                 // NestedPreScroll
                 if (dispatchNestedPreScroll(0, deltaY, mScrollConsumed, mScrollOffset)) {
                     deltaY -= mScrollConsumed[1];
                     event.offsetLocation(0, -mScrollOffset[1]);
-
+                    mNestedOffsetY += mScrollOffset[1];
                 }
                 returnValue = super.onTouchEvent(event);
 
                 // NestedScroll
                 if (dispatchNestedScroll(0, mScrollOffset[1], 0, deltaY, mScrollOffset)) {
                     event.offsetLocation(0, mScrollOffset[1]);
+                    mNestedOffsetY += mScrollOffset[1];
                 }
                 mLastY = eventY;
                 break;
